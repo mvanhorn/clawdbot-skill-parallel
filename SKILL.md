@@ -35,34 +35,76 @@ python3 {baseDir}/scripts/task.py --enrich "company_name=Stripe,website=stripe.c
 # Research report (markdown with citations)
 python3 {baseDir}/scripts/task.py --report "Market analysis of the HVAC industry in USA"
 
-# With authenticated sources (NEW - Jan 2026)
-python3 {baseDir}/scripts/task.py --auth-session cookies.json \
-  "Extract key specs from internal wiki at wiki.company.com/product"
+# With authenticated sources (NEW - Jan 2026, requires browser-use.com key)
+export BROWSERUSE_API_KEY="your-key"
+python3 {baseDir}/scripts/task.py "Extract specs from https://nxp.com/products/K66_180"
 ```
 
-## Authenticated Sources (NEW)
+## Authenticated Sources (NEW - Jan 2026)
 
-Task API now supports **authentication-gated private data sources**:
-- Internal wikis
+Task API now supports **authentication-gated private data sources** via MCP servers:
+- Internal wikis & dashboards
 - Industry databases (NXP, IEEE, etc.)
-- Niche forums
+- CRM systems & subscription services
 - Paywalled content
 
-Provide a browser session/cookies to access gated content:
+Uses [browser-use.com](https://browser-use.com) MCP integration:
+
+### Setup
+1. Get API key from [browser-use.com](https://browser-use.com)
+2. Create a **profile** with saved login sessions ([Profile Docs](https://docs.cloud.browser-use.com/concepts/profile))
+3. Set `BROWSERUSE_API_KEY` env var
+
+### Usage
+```bash
+# CLI
+export BROWSERUSE_API_KEY="your-key"
+python3 {baseDir}/scripts/task.py "Extract specs from https://nxp.com/products/K66_180"
+```
+
 ```python
+# Python SDK
 task_run = client.beta.task_run.create(
     input="Extract migration guide from NXP K66 docs",
     processor="ultra",
-    auth_session={
-        "cookies": [{"name": "session", "value": "...", "domain": ".nxp.com"}]
-    }
+    mcp_servers=[{
+        "type": "url",
+        "url": "https://api.browser-use.com/mcp",
+        "name": "browseruse",
+        "headers": {"Authorization": "Bearer YOUR_BROWSERUSE_KEY"}
+    }],
+    betas=["mcp-server-2025-07-17"]
 )
 ```
 
-**Use cases:**
-- Research behind login walls
-- Extract from internal documentation
-- Industry database enrichment
+```bash
+# cURL
+curl -X POST "https://api.parallel.ai/v1/tasks/runs" \
+  -H "x-api-key: $PARALLEL_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "parallel-beta: mcp-server-2025-07-17" \
+  --data '{
+    "input": "Extract data from internal dashboard",
+    "processor": "ultra",
+    "mcp_servers": [{
+      "type": "url",
+      "url": "https://api.browser-use.com/mcp",
+      "name": "browseruse",
+      "headers": {"Authorization": "Bearer YOUR_KEY"}
+    }]
+  }'
+```
+
+**Requirements:**
+- browser-use.com API key + profile with saved credentials
+- `parallel-beta: mcp-server-2025-07-17` header
+- Processor: `ultra` (supports multiple tool calls)
+- Max 10 MCP servers per request
+
+**Capabilities:**
+- Navigate SPAs and JS-heavy sites
+- Fill forms, click buttons, multi-step workflows
+- Combine with Parallel's public web research
 
 ## Processors
 

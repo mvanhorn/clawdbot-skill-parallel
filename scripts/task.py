@@ -6,7 +6,10 @@ Usage:
   python3 task.py "What was France's GDP in 2023?"
   python3 task.py --enrich "company_name=Stripe" --output "founding_year,funding"
   python3 task.py --report "Market analysis of HVAC industry"
-  python3 task.py --auth-session cookies.json "Extract from private wiki"
+  
+  # Authenticated page access (requires browser-use.com API key)
+  export BROWSERUSE_API_KEY="your-key"
+  python3 task.py "Extract migration docs from https://nxp.com/products/K66_180"
 """
 
 import os
@@ -27,7 +30,7 @@ def create_task(
     task_spec: dict = None,
     include_domains: list = None,
     exclude_domains: list = None,
-    auth_session: dict = None,
+    mcp_servers: list = None,
 ) -> dict:
     """Create and run a task."""
     params = {
@@ -47,9 +50,10 @@ def create_task(
             source_policy["exclude_domains"] = exclude_domains
         params["source_policy"] = source_policy
     
-    # Authenticated session (new feature - Jan 2026)
-    if auth_session:
-        params["auth_session"] = auth_session
+    # MCP servers for authenticated browsing (Jan 2026 feature)
+    if mcp_servers:
+        params["mcp_servers"] = mcp_servers
+        params["betas"] = ["mcp-server-2025-07-17"]
     
     # Create task run
     task_run = client.beta.task_run.create(**params)
@@ -173,8 +177,8 @@ def main():
                        help="Comma-separated domains to include")
     parser.add_argument("--exclude-domains", metavar="DOMAINS",
                        help="Comma-separated domains to exclude")
-    parser.add_argument("--auth-session", metavar="FILE",
-                       help="JSON file with authentication cookies for private sources")
+    parser.add_argument("--browseruse-key", metavar="KEY",
+                       help="browser-use.com API key for authenticated page access")
     parser.add_argument("--timeout", "-t", type=int, default=300,
                        help="Timeout in seconds (default: 300)")
     parser.add_argument("--json", "-j", action="store_true",
@@ -219,15 +223,16 @@ def main():
     if args.exclude_domains:
         exclude_domains = [d.strip() for d in args.exclude_domains.split(",")]
     
-    # Load auth session if provided
-    auth_session = None
-    if args.auth_session:
-        try:
-            with open(args.auth_session) as f:
-                auth_session = json.load(f)
-        except Exception as e:
-            print(f"Error loading auth session: {e}", file=sys.stderr)
-            sys.exit(1)
+    # Build MCP servers for authenticated browsing
+    mcp_servers = None
+    browseruse_key = args.browseruse_key or os.environ.get("BROWSERUSE_API_KEY")
+    if browseruse_key:
+        mcp_servers = [{
+            "type": "url",
+            "url": "https://api.browser-use.com/mcp",
+            "name": "browseruse",
+            "headers": {"Authorization": f"Bearer {browseruse_key}"}
+        }]
     
     # Create task
     try:
@@ -238,7 +243,7 @@ def main():
             task_spec=task_spec,
             include_domains=include_domains,
             exclude_domains=exclude_domains,
-            auth_session=auth_session,
+            mcp_servers=mcp_servers,
         )
         
         run_id = task_run.run.run_id if hasattr(task_run, 'run') else task_run.run_id
