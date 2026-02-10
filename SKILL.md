@@ -6,6 +6,9 @@ triggers:
   - deep search
   - research
   - enrich
+  - findall
+  - monitor
+  - extract
 metadata:
   clawdbot:
     emoji: "🔬"
@@ -15,15 +18,29 @@ metadata:
 
 High-accuracy web research API built for AI agents. Outperforms Perplexity/Exa on research benchmarks.
 
-## APIs
+## APIs Overview
 
-### Search API - Quick web search
+| API | Use Case | Speed |
+|-----|----------|-------|
+| **Search** | Quick lookups, current events | Fast |
+| **Task** | Deep research, enrichment, reports | Medium-Slow |
+| **FindAll** | Entity discovery → structured datasets | Slow (async) |
+| **Extract** | Clean content from URLs/PDFs | Fast |
+| **Monitor** | Continuous tracking with alerts | Recurring |
+
+---
+
+## Search API - Quick web search
+
 ```bash
 python3 {baseDir}/scripts/search.py "Who is the CEO of Anthropic?" --max-results 5
 python3 {baseDir}/scripts/search.py "latest AI news" --json
 ```
 
-### Task API - Deep research & enrichment
+---
+
+## Task API - Deep research & enrichment
+
 ```bash
 # Simple question → answer
 python3 {baseDir}/scripts/task.py "What was France's GDP in 2023?"
@@ -35,78 +52,12 @@ python3 {baseDir}/scripts/task.py --enrich "company_name=Stripe,website=stripe.c
 # Research report (markdown with citations)
 python3 {baseDir}/scripts/task.py --report "Market analysis of the HVAC industry in USA"
 
-# With authenticated sources (NEW - Jan 2026, requires browser-use.com key)
+# With authenticated sources (requires browser-use.com key)
 export BROWSERUSE_API_KEY="your-key"
 python3 {baseDir}/scripts/task.py "Extract specs from https://nxp.com/products/K66_180"
 ```
 
-## Authenticated Sources (NEW - Jan 2026)
-
-Task API now supports **authentication-gated private data sources** via MCP servers:
-- Internal wikis & dashboards
-- Industry databases (NXP, IEEE, etc.)
-- CRM systems & subscription services
-- Paywalled content
-
-Uses [browser-use.com](https://browser-use.com) MCP integration:
-
-### Setup
-1. Get API key from [browser-use.com](https://browser-use.com)
-2. Create a **profile** with saved login sessions ([Profile Docs](https://docs.cloud.browser-use.com/concepts/profile))
-3. Set `BROWSERUSE_API_KEY` env var
-
-### Usage
-```bash
-# CLI
-export BROWSERUSE_API_KEY="your-key"
-python3 {baseDir}/scripts/task.py "Extract specs from https://nxp.com/products/K66_180"
-```
-
-```python
-# Python SDK
-task_run = client.beta.task_run.create(
-    input="Extract migration guide from NXP K66 docs",
-    processor="ultra",
-    mcp_servers=[{
-        "type": "url",
-        "url": "https://api.browser-use.com/mcp",
-        "name": "browseruse",
-        "headers": {"Authorization": "Bearer YOUR_BROWSERUSE_KEY"}
-    }],
-    betas=["mcp-server-2025-07-17"]
-)
-```
-
-```bash
-# cURL
-curl -X POST "https://api.parallel.ai/v1/tasks/runs" \
-  -H "x-api-key: $PARALLEL_API_KEY" \
-  -H "Content-Type: application/json" \
-  -H "parallel-beta: mcp-server-2025-07-17" \
-  --data '{
-    "input": "Extract data from internal dashboard",
-    "processor": "ultra",
-    "mcp_servers": [{
-      "type": "url",
-      "url": "https://api.browser-use.com/mcp",
-      "name": "browseruse",
-      "headers": {"Authorization": "Bearer YOUR_KEY"}
-    }]
-  }'
-```
-
-**Requirements:**
-- browser-use.com API key + profile with saved credentials
-- `parallel-beta: mcp-server-2025-07-17` header
-- Processor: `ultra` (supports multiple tool calls)
-- Max 10 MCP servers per request
-
-**Capabilities:**
-- Navigate SPAs and JS-heavy sites
-- Fill forms, click buttons, multi-step workflows
-- Combine with Parallel's public web research
-
-## Processors
+### Processors
 
 | Processor | Speed | Depth | Use Case |
 |-----------|-------|-------|----------|
@@ -114,28 +65,144 @@ curl -X POST "https://api.parallel.ai/v1/tasks/runs" \
 | `core` | Medium | Standard | Enrichment, structured data |
 | `ultra` | Slow | Deep | Reports, multi-hop research |
 
-## Response Format
+---
 
-### Search API
-- `search_id` - unique identifier
-- `results[]` - url, title, excerpts, publish_date
-- `usage` - API usage stats
+## FindAll API - Entity discovery (NEW Feb 2026)
 
-### Task API
-- `run_id` - task identifier
-- `output.content` - structured result or markdown report
-- `output.basis[]` - citations, reasoning, confidence per field
+Turn natural language into structured datasets. "Find all dental practices in Ohio with 4+ star reviews" → enriched list with citations.
 
-## When to Use
+```bash
+# Basic entity discovery
+python3 {baseDir}/scripts/findall.py "Find all AI startups that raised Series A in 2025"
 
-- **Search API**: Quick lookups, current events, simple queries
-- **Task API**: 
-  - Enrichment at scale (CRM, company lists)
-  - Deep research reports with citations
-  - Accessing authenticated/gated sources
-  - Structured output with confidence levels
+# With enrichment
+python3 {baseDir}/scripts/findall.py "portfolio companies of Khosla Ventures" \
+  --enrich "funding,employee_count,founder_names" --limit 50
+
+# Lead generation
+python3 {baseDir}/scripts/findall.py "residential roofing companies in Charlotte, NC" --generator pro
+
+# Check status of running job
+python3 {baseDir}/scripts/findall.py --status findall_abc123
+```
+
+### Generators
+
+| Generator | Coverage | Cost | Use Case |
+|-----------|----------|------|----------|
+| `base` | Limited | Low | Quick discovery, prototyping |
+| `core` | Balanced | Medium | Most use cases |
+| `pro` | Comprehensive | High | Maximum recall (61% benchmark) |
+
+### How it works
+1. **Ingest**: Converts natural language → entity type + match conditions
+2. **Generate**: Searches web for candidate entities
+3. **Evaluate**: Validates each candidate against match conditions
+4. **Enrich**: Extracts additional fields for matched entities
+
+---
+
+## Extract API - Clean content extraction (NEW Feb 2026)
+
+Convert any URL into clean markdown - handles JS-heavy pages, PDFs, paywalls.
+
+```bash
+# Basic extraction with excerpts
+python3 {baseDir}/scripts/extract.py https://stripe.com/docs/api
+
+# Full content (not just excerpts)
+python3 {baseDir}/scripts/extract.py https://arxiv.org/pdf/2301.00000.pdf --full
+
+# Focused extraction
+python3 {baseDir}/scripts/extract.py https://sec.gov/10-K.htm --objective "Extract risk factors"
+
+# Multiple URLs at once
+python3 {baseDir}/scripts/extract.py https://url1.com https://url2.com --json
+```
+
+### Use Cases
+- **API documentation** - Pull complete references and code examples
+- **PDF research papers** - Extract methodology, results, citations
+- **SEC filings** - Extract specific sections from 10-Ks, earnings reports
+- **News articles** - Get clean text without ads/nav/paywalls
+
+---
+
+## Monitor API - Continuous tracking (NEW Feb 2026)
+
+Set up recurring queries - get alerts when things change.
+
+```bash
+# Create a monitor
+python3 {baseDir}/scripts/monitor.py create "Track AI funding news" --cadence daily
+python3 {baseDir}/scripts/monitor.py create "Alert when AirPods drop below $150" --cadence hourly
+
+# With webhook notifications
+python3 {baseDir}/scripts/monitor.py create "OpenAI product announcements" \
+  --cadence daily --webhook https://your-endpoint.com/webhook
+
+# List all monitors
+python3 {baseDir}/scripts/monitor.py list
+
+# Get events (detected changes)
+python3 {baseDir}/scripts/monitor.py events monitor_abc123
+python3 {baseDir}/scripts/monitor.py events monitor_abc123 --lookback 10d
+
+# Delete a monitor
+python3 {baseDir}/scripts/monitor.py delete monitor_abc123
+```
+
+### Cadences
+- `hourly` - Fast-moving topics, stock/price tracking
+- `daily` - News, competitive intel (most common)
+- `weekly` - Slower changes, policy updates
+
+### Example queries
+- **News**: "Let me know when someone mentions Parallel Web Systems"
+- **Competitive**: "Alert me when Apple announces new MacBook models"
+- **Price**: "Notify me when PS5 Pro is back in stock at Best Buy"
+- **Policy**: "Track changes to OpenAI's terms of service"
+
+---
+
+## Authenticated Sources (Jan 2026)
+
+Task API supports **authentication-gated private data sources** via MCP servers:
+- Internal wikis & dashboards
+- Industry databases (NXP, IEEE, etc.)
+- CRM systems & subscription services
+
+Uses [browser-use.com](https://browser-use.com) MCP integration:
+
+### Setup
+1. Get API key from [browser-use.com](https://browser-use.com)
+2. Create a **profile** with saved login sessions
+3. Set `BROWSERUSE_API_KEY` env var
+
+### Usage
+```bash
+export BROWSERUSE_API_KEY="your-key"
+python3 {baseDir}/scripts/task.py "Extract migration guide from NXP K66 docs"
+```
+
+---
+
+## When to Use Each API
+
+| Scenario | API | Why |
+|----------|-----|-----|
+| Quick fact lookup | Search | Fast, simple |
+| Company enrichment | Task | Structured output with citations |
+| Build a prospect list | FindAll | Discovers + validates + enriches |
+| Extract content from URL | Extract | Handles JS, PDFs, paywalls |
+| Ongoing tracking | Monitor | Set once, get alerts |
+| Deep research report | Task (--report) | Multi-hop with citations |
+| Access gated content | Task + MCP | Authenticated browsing |
+
+---
 
 ## API Reference
 
-Docs: https://docs.parallel.ai
-Platform: https://platform.parallel.ai
+- Docs: https://docs.parallel.ai
+- Platform: https://platform.parallel.ai
+- Changelog: https://parallel.ai/blog
