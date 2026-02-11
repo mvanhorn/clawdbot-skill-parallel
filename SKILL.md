@@ -1,6 +1,8 @@
 ---
 name: parallel
 description: High-accuracy web search and research via Parallel.ai API. Optimized for AI agents with rich excerpts and citations. Supports authenticated/private sources.
+user-invocable: true
+disable-model-invocation: true
 triggers:
   - parallel
   - deep search
@@ -10,8 +12,12 @@ triggers:
   - monitor
   - extract
 metadata:
-  clawdbot:
+  openclaw:
     emoji: "🔬"
+    primaryEnv: PARALLEL_API_KEY
+    requires:
+      bins: [python3]
+      env: [PARALLEL_API_KEY]
 ---
 
 # Parallel.ai 🔬
@@ -206,3 +212,20 @@ python3 {baseDir}/scripts/task.py "Extract migration guide from NXP K66 docs"
 - Docs: https://docs.parallel.ai
 - Platform: https://platform.parallel.ai
 - Changelog: https://parallel.ai/blog
+
+---
+
+## Security & Permissions
+
+**What this skill does:**
+- Makes API calls to `api.parallel.ai` for web search, research, extraction, and monitoring
+- All scripts are read-only research tools — they do not modify any local or remote data
+- The `BROWSERUSE_API_KEY` (optional) is only used for authenticated source access via browser-use.com
+
+**What this skill does NOT do:**
+- Does not send your API key to any endpoint other than `api.parallel.ai`
+- Does not access local files, databases, or system resources
+- Does not write to disk (except JSON output when using `--json`)
+- Cannot be invoked autonomously by the agent (`disable-model-invocation: true`)
+
+Review `scripts/` before first use to verify behavior.
