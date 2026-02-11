@@ -20,9 +20,31 @@ metadata:
       env: [PARALLEL_API_KEY, BROWSERUSE_API_KEY]
 ---
 
-# Parallel.ai 🔬
+# Parallel.ai
 
-High-accuracy web research API built for AI agents. Outperforms Perplexity/Exa on research benchmarks.
+High-accuracy web research API built for AI agents.
+
+## Setup
+
+Install required Python packages:
+
+```bash
+pip install parallel-sdk requests
+```
+
+Set your API key:
+
+```bash
+export PARALLEL_API_KEY="your-key"
+```
+
+Get your key at: https://platform.parallel.ai
+
+Optional for authenticated sources:
+
+```bash
+export BROWSERUSE_API_KEY="your-key"
+```
 
 ## APIs Overview
 
@@ -219,13 +241,17 @@ python3 {baseDir}/scripts/task.py "Extract migration guide from NXP K66 docs"
 
 **What this skill does:**
 - Makes API calls to `api.parallel.ai` for web search, research, extraction, and monitoring
+- `monitor.py` uses the `requests` library; all other scripts use the `parallel-sdk` package
 - All scripts are read-only research tools — they do not modify any local or remote data
-- The `BROWSERUSE_API_KEY` (optional) is only used for authenticated source access via browser-use.com
+- The `BROWSERUSE_API_KEY` (optional) is only used for authenticated source access via `api.browser-use.com`
 
 **What this skill does NOT do:**
-- Does not send your API key to any endpoint other than `api.parallel.ai`
+- Does not send your API keys to any endpoint other than `api.parallel.ai` and `api.browser-use.com`
 - Does not access local files, databases, or system resources
+- Does not read config files or access the filesystem
 - Does not write to disk (except JSON output when using `--json`)
 - Cannot be invoked autonomously by the agent (`disable-model-invocation: true`)
+
+**Python dependencies:** `parallel-sdk`, `requests` (install via `pip install parallel-sdk requests`)
 
 Review `scripts/` before first use to verify behavior.
