@@ -15,7 +15,10 @@ import argparse
 
 from parallel import Parallel
 
-API_KEY = os.environ.get("PARALLEL_API_KEY", "REDACTED_KEY_ROTATE_IMMEDIATELY")
+API_KEY = os.environ.get("PARALLEL_API_KEY")
+if not API_KEY:
+    print("Error: PARALLEL_API_KEY environment variable is required", file=sys.stderr)
+    sys.exit(1)
 
 
 def extract(

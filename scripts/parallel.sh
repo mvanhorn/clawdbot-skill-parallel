@@ -4,7 +4,7 @@
 
 set -e
 
-API_KEY="${PARALLEL_API_KEY:-REDACTED_KEY_ROTATE_IMMEDIATELY}"
+API_KEY="${PARALLEL_API_KEY:?Error: PARALLEL_API_KEY environment variable is required}"
 BASE_URL="https://api.parallel.ai/v1"
 MAX_WAIT="${PARALLEL_MAX_WAIT:-120}"
 
