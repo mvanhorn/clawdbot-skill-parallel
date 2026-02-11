@@ -12,7 +12,7 @@ triggers:
   - monitor
   - extract
 metadata:
-  openclaw:
+  clawdbot:
     emoji: "🔬"
     primaryEnv: PARALLEL_API_KEY
     requires:
