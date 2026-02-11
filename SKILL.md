@@ -17,7 +17,7 @@ metadata:
     primaryEnv: PARALLEL_API_KEY
     requires:
       bins: [python3]
-      env: [PARALLEL_API_KEY]
+      env: [PARALLEL_API_KEY, BROWSERUSE_API_KEY]
 ---
 
 # Parallel.ai 🔬
