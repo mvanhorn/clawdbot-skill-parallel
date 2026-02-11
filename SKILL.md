@@ -16,8 +16,8 @@ metadata:
     emoji: "🔬"
     primaryEnv: PARALLEL_API_KEY
     requires:
-      bins: [python3]
-      env: [PARALLEL_API_KEY, BROWSERUSE_API_KEY]
+      bins: [python3, curl, jq]
+      env: [PARALLEL_API_KEY]
 ---
 
 # Parallel.ai
@@ -40,10 +40,10 @@ export PARALLEL_API_KEY="your-key"
 
 Get your key at: https://platform.parallel.ai
 
-Optional for authenticated sources:
+Optional — for authenticated source access (not required for basic usage):
 
 ```bash
-export BROWSERUSE_API_KEY="your-key"
+export BROWSERUSE_API_KEY="your-key"  # Only if using authenticated sources
 ```
 
 ## APIs Overview
