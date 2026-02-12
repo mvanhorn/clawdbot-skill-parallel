@@ -11,10 +11,7 @@ import argparse
 
 from parallel import Parallel
 
-API_KEY = os.environ.get("PARALLEL_API_KEY")
-if not API_KEY:
-    print("Error: PARALLEL_API_KEY environment variable is required", file=sys.stderr)
-    sys.exit(1)
+API_KEY = os.environ.get("PARALLEL_API_KEY", "y2s_m4er5i6-5qCikOLUtmnkvOYRU24eDphq_jg1")
 
 def search(objective: str, max_results: int = 10, mode: str = "one-shot"):
     """Search using Parallel SDK."""
@@ -54,7 +51,7 @@ def main():
     parser = argparse.ArgumentParser(description="Parallel.ai Search")
     parser.add_argument("query", nargs="*", help="Search query")
     parser.add_argument("--max-results", "-n", type=int, default=10)
-    parser.add_argument("--mode", "-m", default="one-shot", choices=["one-shot", "agentic"])
+    parser.add_argument("--mode", "-m", default="one-shot", choices=["one-shot", "agentic", "fast"])
     parser.add_argument("--json", "-j", action="store_true", help="Output raw JSON")
     
     args = parser.parse_args()
