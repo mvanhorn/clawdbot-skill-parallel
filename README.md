@@ -1,46 +1,52 @@
-# Parallel.ai Search 🔬
+# 🔬 Parallel Skill for OpenClaw
 
-High-accuracy web search API built for AI agents. Outperforms Perplexity/Exa on research benchmarks.
+High-accuracy web search via [Parallel.ai](https://parallel.ai), built for AI agents. Outperforms Perplexity and Exa on research benchmarks.
 
-## Features
+## What it does
 
-- **Three search modes** for different use cases:
-  - `one-shot` — Default, balanced accuracy
-  - `fast` ⚡ — Lower latency/cost for quick lookups
-  - `agentic` — Multi-hop reasoning for complex research
-- Rich excerpts with citations
-- Optimized for LLM context efficiency
+- **Deep research** - cross-referenced facts with citations and excerpts
+- **Multiple search modes** - one-shot (balanced), fast (quick lookups), agentic (multi-hop reasoning)
+- **Rich results** - URLs, titles, relevant excerpts, publish dates
+- **Company/person research** - evidence-based outputs with source links
 
-## Installation
+## Quick start
 
-```bash
-# Install via ClawHub
-clawhub install parallel
-```
-
-## Usage
+### Install the skill
 
 ```bash
-# Default search
-python3 scripts/search.py "Who founded OpenAI?" --max-results 5
-
-# Fast mode (new!) ⚡
-python3 scripts/search.py "latest AI news" --mode fast
-
-# Agentic mode for deep research
-python3 scripts/search.py "compare transformer architectures" --mode agentic
+git clone https://github.com/mvanhorn/clawdbot-skill-parallel.git ~/.openclaw/skills/parallel
 ```
 
-## API Reference
+### Set up your API key
+
+Get a key from [Parallel.ai](https://platform.parallel.ai), then:
+
+```bash
+export PARALLEL_API_KEY="your-key-here"
+```
+
+### Example chat usage
+
+- "Use Parallel to research transformer architectures"
+- "Deep search for the latest on AI regulation in the EU"
+- "Research who's behind Anthropic - founders, funding, board"
+- "Fact-check this claim about GPT-5 with sources"
+
+## Search modes
+
+| Mode | Use case | Tradeoff |
+|------|----------|----------|
+| `one-shot` | Default, most queries | Balanced accuracy and speed |
+| `fast` | Quick lookups, cost-sensitive | Lower latency, may sacrifice depth |
+| `agentic` | Complex multi-hop research | Higher accuracy, more expensive |
+
+## How it works
+
+Uses the Parallel Python SDK (`parallel-web`). The skill runs a search script that returns structured results with URLs, titles, excerpts, and publish dates. Results include usage stats for cost tracking.
 
 - Docs: https://docs.parallel.ai
 - Platform: https://platform.parallel.ai
 
-## Changelog
+## License
 
-### 1.1.0 (2026-02-12)
-- Added **fast mode** (`--mode fast`) for lower latency/cost searches
-- Added mode comparison table to docs
-
-### 1.0.1
-- Initial release with one-shot and agentic modes
+MIT
