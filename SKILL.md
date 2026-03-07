@@ -1,6 +1,11 @@
 ---
 name: parallel
-description: High-accuracy web search and research via Parallel.ai API. Optimized for AI agents with rich excerpts and citations.
+version: "1.1.0"
+description: High-accuracy web search and research via Parallel.ai API. Optimized for AI agents with rich excerpts and citations. Supports agentic mode for token-efficient multi-step reasoning.
+author: mvanhorn
+license: MIT
+repository: https://github.com/mvanhorn/clawdbot-skill-parallel
+homepage: https://parallel.ai
 triggers:
   - parallel
   - deep search
@@ -8,6 +13,16 @@ triggers:
 metadata:
   clawdbot:
     emoji: "🔬"
+    requires:
+      env:
+        - PARALLEL_API_KEY
+    primaryEnv: PARALLEL_API_KEY
+    tags:
+      - search
+      - research
+      - web
+      - parallel
+      - citations
 ---
 
 # Parallel.ai 🔬

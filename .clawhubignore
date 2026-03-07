@@ -1,0 +1,16 @@
+# Exclude binaries and dev artifacts from ClawHub bundle
+node_modules/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.mp3
+*.mp4
+*.zip
+*.tar.gz
+tests/
+test/
+__pycache__/
+*.pyc
+.DS_Store
+
