@@ -11,7 +11,7 @@ triggers:
   - deep search
   - research
 metadata:
-  clawdbot:
+  openclaw:
     emoji: "🔬"
     requires:
       env:
