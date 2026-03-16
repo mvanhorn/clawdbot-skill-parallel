@@ -1,18 +1,16 @@
 # Parallel Skill for OpenClaw
 
-High-accuracy web search via [Parallel.ai](https://parallel.ai), built for AI agents. Outperforms Perplexity and Exa on research benchmarks.
+High-accuracy web research platform via [Parallel.ai](https://parallel.ai), built for AI agents. 7 APIs covering search, extraction, deep research, chat, entity discovery, monitoring, and batch execution.
 
 ## What it does
 
-- **Deep research** - cross-referenced facts with citations and excerpts
-- **Multiple search modes** - one-shot (balanced), fast (quick lookups), agentic (multi-hop reasoning)
-- **Rich results** - URLs, titles, relevant excerpts, publish dates
-- **Batch search** - run multiple queries in parallel for comparison research
-- **Deep research mode** - break complex questions into sub-queries, synthesize findings
-- **Source filtering** - include/exclude specific domains, focus on academic or news sources
-- **Content extraction** - pull clean text from any URL with targeted objectives
-- **FindAll** - natural language to structured datasets (e.g., "AI startups that raised Series A")
-- **Monitoring** - continuous web tracking with webhook alerts
+- **Search** - high-accuracy web search with 3 modes: one-shot, fast (~1s), agentic (multi-hop)
+- **Extract** - pull clean content from URLs, JS-rendered pages, and PDFs
+- **Task (Deep Research)** - 8 processor tiers (lite through ultra8x), MCP tool calling, authenticated browsing
+- **Chat** - OpenAI-compatible chat completions with web grounding and basis citations
+- **FindAll** - entity discovery at web scale with 4 generator tiers (preview, base, core, pro)
+- **Monitor** - scheduled web change tracking with webhook notifications
+- **Task Groups** - batch up to 1,000 research tasks per POST with SSE streaming
 
 ## Quick start
 
@@ -36,18 +34,29 @@ export PARALLEL_API_KEY="your-key-here"
 
 - "Use Parallel to research transformer architectures"
 - "Deep search for the latest on AI regulation in the EU"
-- "Research who's behind Anthropic - founders, funding, board"
-- "Fact-check this claim about GPT-5 with sources"
 - "Find all AI startups that raised Series A in the last 6 months"
 - "Monitor AI safety news daily and alert me"
+- "Chat with web grounding about recent funding rounds"
+- "Batch research the top 10 cloud providers"
 
-## Search modes
+## APIs
 
-| Mode | Use case | Tradeoff |
-|------|----------|----------|
-| `one-shot` | Default, most queries | Balanced accuracy and speed |
-| `fast` | Quick lookups, cost-sensitive | Lower latency, may sacrifice depth |
-| `agentic` | Complex multi-hop research | Higher accuracy, more expensive |
+| API | Endpoint | Description |
+|-----|----------|-------------|
+| Search | `POST /v1/search` | Web search with one-shot, fast, agentic modes |
+| Extract | `POST /v1beta/extract` | Content extraction from URLs and PDFs |
+| Task | `POST /v1/tasks/runs` | Deep research with 8 processor tiers |
+| Chat | `POST /v1/chat/completions` | OpenAI-compatible with web grounding |
+| FindAll | `POST /v1beta/findall/runs` | Entity discovery at scale |
+| Monitor | `POST /v1alpha/monitors` | Scheduled web change tracking |
+| Task Groups | `POST /v1beta/tasks/groups` | Batch up to 1,000 tasks |
+
+## SDK and CLI
+
+- **Python:** `pip install parallel-web` (v0.4.2)
+- **TypeScript:** `npm install parallel-web`
+- **CLI:** `brew install parallel-web/tap/parallel-cli`
+- **Vercel AI SDK:** `npm install @parallel-web/ai-sdk-tools`
 
 ## Security
 
@@ -56,9 +65,7 @@ export PARALLEL_API_KEY="your-key-here"
 - Dependencies are pinned in `requirements.txt`
 - When using authenticated sources (BROWSERUSE_API_KEY), be aware that your key is transmitted to Parallel.ai's servers which proxy it to browser-use.com
 
-## How it works
-
-Uses the Parallel Python SDK (`parallel-web`). The skill provides scripts for search, task-based research, content extraction, entity discovery (FindAll), and continuous monitoring. Results include URLs, titles, excerpts, publish dates, and usage stats for cost tracking.
+## Links
 
 - Docs: https://docs.parallel.ai
 - Platform: https://platform.parallel.ai
