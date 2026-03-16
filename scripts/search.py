@@ -11,7 +11,10 @@ import argparse
 
 from parallel import Parallel
 
-API_KEY = os.environ.get("PARALLEL_API_KEY", "y2s_m4er5i6-5qCikOLUtmnkvOYRU24eDphq_jg1")
+API_KEY = os.environ.get("PARALLEL_API_KEY")
+if not API_KEY:
+    print("Error: PARALLEL_API_KEY environment variable is required", file=sys.stderr)
+    sys.exit(1)
 
 def search(objective: str, max_results: int = 10, mode: str = "one-shot"):
     """Search using Parallel SDK."""

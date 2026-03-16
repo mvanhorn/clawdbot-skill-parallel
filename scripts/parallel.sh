@@ -14,10 +14,12 @@ run_task() {
   local processor="${2:-base}"
   
   # Submit
+  local payload=$(jq -n --arg proc "$processor" --arg inp "$input" \
+    '{"processor": $proc, "input": $inp}')
   local response=$(curl -s -X POST "$BASE_URL/tasks/runs" \
     -H "x-api-key: $API_KEY" \
     -H "Content-Type: application/json" \
-    -d "{\"processor\": \"$processor\", \"input\": \"$input\"}")
+    -d "$payload")
   
   local run_id=$(echo "$response" | jq -r '.run_id // empty')
   
