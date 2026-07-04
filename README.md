@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/mvanhorn-clawdbot-skill-parallel-badge.png)](https://mseep.ai/app/mvanhorn-clawdbot-skill-parallel)
+
 # Parallel Skill for OpenClaw
 
 High-accuracy web research platform via [Parallel.ai](https://parallel.ai), built for AI agents. 7 APIs covering search, extraction, deep research, chat, entity discovery, monitoring, and batch execution.
